@@ -18,7 +18,6 @@ export default function Login() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Wellmeadows Hospital
             </Typography>
-            <Button sx={{ color: 'white' }}>Log In</Button>
             <Button sx={{ color: 'white' }}>Sign Up</Button>
           </Toolbar>
         </AppBar>
