@@ -8,9 +8,8 @@ import Typography from '@mui/material/Typography';
 import { Button, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { purple, yellow, green} from '@mui/material/colors';
-
-
+import { purple, yellow, green } from '@mui/material/colors';
+import { Link } from 'react-router-dom';
 
 const defaultTheme = createTheme({
   palette: {
@@ -47,7 +46,7 @@ export default function Dashboard() {
     </Box>
   );
 
-const card = (
+  const card = (
     <React.Fragment>
       <CardContent>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -69,32 +68,30 @@ const card = (
   );
 
   return (
-    <>
-      <ThemeProvider theme={defaultTheme}>
-        <Box sx={{ flexGrow: 1, backgroundColor: 'black' }}>
-          <AppBar position="static" sx={{ backgroundColor: 'black' }}>
-            <Toolbar>
-              <Typography color='white' variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Wellmeadows Hospital
-              </Typography>
-              <Button variant="outlined" color="primary" onClick={handleMenuClick}>
-                Account
-              </Button>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Log out</MenuItem>
-              </Menu>
-            </Toolbar>
-          </AppBar>
-        </Box>
-        <Box sx={{ display: 'flex' }}>
+    <ThemeProvider theme={defaultTheme}>
+      <Box sx={{ flexGrow: 1, backgroundColor: 'black' }}>
+        <AppBar position="static" sx={{ backgroundColor: 'black' }}>
+          <Toolbar>
+            <Typography color='white' variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Wellmeadows Hospital
+            </Typography>
+            <Button variant="outlined" color="primary" onClick={handleMenuClick}>
+              Account
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem component={Link} to="/profile">Profile</MenuItem>
+              <MenuItem component={Link} to="/">Log out</MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
         <Card variant="outlined">{card}</Card>
-        </Box>
-      </ThemeProvider>
-    </>
+      </Box>
+    </ThemeProvider>
   );
 }

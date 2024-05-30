@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
   return (
@@ -18,7 +19,7 @@ export default function Login() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Wellmeadows Hospital
             </Typography>
-            <Button sx={{ color: 'white' }}>Sign Up</Button>
+            <Button sx={{ color: 'white' }} component={Link} to="/Signup">Sign Up</Button>
           </Toolbar>
         </AppBar>
       </Box>
@@ -53,7 +54,7 @@ export default function Login() {
                   label="save my password"
                 />
         </Grid>
-        <Button variant="contained" sx={{ mt: 3, mb: 2, backgroundColor: 'black', color: 'white' }}>Log In</Button>
+        <Button variant="contained" sx={{ mt: 3, mb: 2, backgroundColor: 'black', color: 'white',  }} component={Link} to="/Dashboard">Log In</Button>
       </Box>
     </>
   );

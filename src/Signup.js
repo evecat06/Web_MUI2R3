@@ -4,7 +4,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Container from '@mui/material/Container';
@@ -14,42 +13,45 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        meowmeow.com
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { Link, useNavigate  } from 'react-router-dom';
 
 // Create a theme for Material-UI
 const defaultTheme = createTheme();
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = React.useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    termsAccepted: false,
+  });
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    console.log(formData);
+    // Add logic to send form data to the server or perform any other action
+    navigate('/');
+  };
+
+  const handleChange = (event) => {
+    const { name, value, checked } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === 'termsAccepted' ? checked : value,
+    }));
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ flexGrow: 1, backgroundColor: 'black'  }}>
-        <AppBar position="static"sx={{ backgroundColor: 'black' }}>
+      <Box sx={{ flexGrow: 1, backgroundColor: 'black' }}>
+        <AppBar position="static" sx={{ backgroundColor: 'black' }}>
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Wellmeadows Hospital
             </Typography>
-            <Button sx={{ color: 'white' }}>Log In</Button>
+            <Button sx={{ color: 'white' }} component={Link} to="/">Log In</Button>
           </Toolbar>
         </AppBar>
       </Box>
@@ -61,7 +63,6 @@ export default function Signup() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -81,6 +82,8 @@ export default function Signup() {
                   id="firstName"
                   label="First Name"
                   autoFocus
+                  value={formData.firstName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -91,6 +94,8 @@ export default function Signup() {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
+                  value={formData.lastName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -101,6 +106,8 @@ export default function Signup() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -112,11 +119,20 @@ export default function Signup() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" sx={{ color: 'rgba(0, 0, 0, 0.5)' }}/>}
+                  control={
+                    <Checkbox
+                      name="termsAccepted"
+                      checked={formData.termsAccepted}
+                      onChange={handleChange}
+                      sx={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                    />
+                  }
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
@@ -126,20 +142,18 @@ export default function Signup() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, backgroundColor: 'black', color: 'white' }}
-              
             >
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link to="/" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
