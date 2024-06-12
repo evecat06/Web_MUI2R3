@@ -10,8 +10,9 @@ import { Button, Menu, MenuItem, List, ListItem, ListItemText } from '@mui/mater
 import { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { purple, yellow, green } from '@mui/material/colors';
-import { Link } from 'react-router-dom';
+
 import supabase from './supabaseClient'; // Import Supabase client
+import Appointment from './Appointment'; // Import the Appoinment component
 
 const defaultTheme = createTheme({
   palette: {
@@ -31,6 +32,7 @@ const defaultTheme = createTheme({
 export default function Dashboard() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [view, setView] = useState('dashboard'); // State to manage the view
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -38,6 +40,10 @@ export default function Dashboard() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleAppointmentButtonClick = () => {
+    setView('Appointment'); // Change the view to features
   };
 
   useEffect(() => {
@@ -179,24 +185,34 @@ export default function Dashboard() {
         </AppBar>
       </Box>
       <Box sx={{ padding: 4 }}>
-        <Grid item xs={12} md={6}>
-            {welcomeUserCard}
-          </Grid>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            {wordOfTheDayCard}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {patientStatsCard}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {recentActivitiesCard}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {announcementsCard}
-          </Grid>
-          
-        </Grid>
+        {view === 'dashboard' ? (
+          <>
+            <Grid item xs={12} md={6}>
+              {welcomeUserCard}
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                {wordOfTheDayCard}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                {patientStatsCard}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                {recentActivitiesCard}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                {announcementsCard}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Button variant="contained" color="primary" onClick={handleAppointmentButtonClick}>
+                  Availability
+                </Button>
+              </Grid>
+            </Grid>
+          </>
+        ) : (
+          <Appointment />
+        )}
       </Box>
     </ThemeProvider>
   );
