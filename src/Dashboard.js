@@ -5,11 +5,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { Button, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
+import Grid from '@mui/material/Grid';
+import { Button, Menu, MenuItem, List, ListItem, ListItemText } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { purple, yellow, green } from '@mui/material/colors';
 import { Link } from 'react-router-dom';
+import supabase from './supabaseClient'; // Import Supabase client
 
 const defaultTheme = createTheme({
   palette: {
@@ -28,6 +30,7 @@ const defaultTheme = createTheme({
 
 export default function Dashboard() {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -36,6 +39,21 @@ export default function Dashboard() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userProfile } = await supabase
+          .from('Userlogin')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        setUserData(userProfile);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   const bull = (
     <Box
@@ -46,8 +64,8 @@ export default function Dashboard() {
     </Box>
   );
 
-  const card = (
-    <React.Fragment>
+  const wordOfTheDayCard = (
+    <Card variant="outlined" sx={{ minWidth: 275, margin: 2 }}>
       <CardContent>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
           Word of the Day
@@ -64,7 +82,78 @@ export default function Dashboard() {
           {'"a benevolent smile"'}
         </Typography>
       </CardContent>
-    </React.Fragment>
+    </Card>
+  );
+
+  const patientStatsCard = (
+    <Card variant="outlined" sx={{ minWidth: 275, margin: 2 }}>
+      <CardContent>
+        <Typography variant="h6" component="div">
+          Patient Statistics
+        </Typography>
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          Total Patients: 120
+        </Typography>
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          Admitted Today: 10
+        </Typography>
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          Discharged Today: 5
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+
+  const recentActivitiesCard = (
+    <Card variant="outlined" sx={{ minWidth: 275, margin: 2 }}>
+      <CardContent>
+        <Typography variant="h6" component="div">
+          Recent Activities
+        </Typography>
+        <List>
+          <ListItem>
+            <ListItemText primary="John Doe admitted" secondary="2 hours ago" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="Jane Smith discharged" secondary="3 hours ago" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="Dr. Brown's surgery completed" secondary="4 hours ago" />
+          </ListItem>
+        </List>
+      </CardContent>
+    </Card>
+  );
+
+  const announcementsCard = (
+    <Card variant="outlined" sx={{ minWidth: 275, margin: 2 }}>
+      <CardContent>
+        <Typography variant="h6" component="div">
+          Announcements
+        </Typography>
+        <List>
+          <ListItem>
+            <ListItemText primary="Staff meeting at 3 PM" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="New COVID-19 protocols" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="Upcoming health fair on Saturday" />
+          </ListItem>
+        </List>
+      </CardContent>
+    </Card>
+  );
+
+  const welcomeUserCard = userData && (
+    <Card variant="outlined" sx={{ minWidth: 275, margin: 2 }}>
+      <CardContent>
+        <Typography variant="h6" component="div">
+          Welcome, {userData.fname} {userData.lname}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 
   return (
@@ -89,8 +178,25 @@ export default function Dashboard() {
           </Toolbar>
         </AppBar>
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
-        <Card variant="outlined">{card}</Card>
+      <Box sx={{ padding: 4 }}>
+        <Grid item xs={12} md={6}>
+            {welcomeUserCard}
+          </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            {wordOfTheDayCard}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {patientStatsCard}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {recentActivitiesCard}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {announcementsCard}
+          </Grid>
+          
+        </Grid>
       </Box>
     </ThemeProvider>
   );

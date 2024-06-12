@@ -7,7 +7,7 @@ import Dashboard from '../Dashboard';
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/Login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/Signup" element={<Signup />} />
       <Route path="/Dashboard" element={<Dashboard />} />
     </Routes>

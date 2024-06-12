@@ -1,47 +1,86 @@
 import * as React from 'react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import { Link, useNavigate  } from 'react-router-dom';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import supabase from './supabaseClient'; // Import Supabase client
 
-// Create a theme for Material-UI
 const defaultTheme = createTheme();
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [formData, setFormData] = React.useState({
-    firstName: '',
-    lastName: '',
+  const [formData, setFormData] = useState({
+    fname: '',
+    lname: '',
     email: '',
     password: '',
-    termsAccepted: false,
+    phone: '',
+    terms: false,
   });
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(formData);
-    // Add logic to send form data to the server or perform any other action
-    navigate('/');
-  };
-
-  const handleChange = (event) => {
-    const { name, value, checked } = event.target;
+  const handleChange = (e) => {
+    const { name, value, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === 'termsAccepted' ? checked : value,
+      [name]: name === 'terms' ? checked : value,
     }));
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsError(false);
+  
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+    }, {
+      data: {
+        fname: formData.fname,
+        lname: formData.lname,
+        phone: formData.phone,
+      }
+    });
+  
+    if (signUpError) {
+      setIsError(true);
+      setErrorMessage(signUpError.message);
+    } else {
+      const { user } = signUpData;
+      // Insert user data into 'users' table
+      const { data: insertData, error: insertError } = await supabase
+        .from('Userlogin')
+        .insert([
+          {
+            fname: formData.fname,
+            lname: formData.lname,
+            email: formData.email,
+            phone: formData.phone,
+            terms: formData.terms,
+          },
+        ]);
+  
+      if (insertError) {
+        setIsError(true);
+        setErrorMessage(insertError.message);
+      } else {
+        navigate('/');
+      }
+    }
+  };  
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -51,7 +90,9 @@ export default function Signup() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Wellmeadows Hospital
             </Typography>
-            <Button sx={{ color: 'white' }} component={Link} to="/">Log In</Button>
+            <Button sx={{ color: 'white' }} component={Link} to="/">
+              Log In
+            </Button>
           </Toolbar>
         </AppBar>
       </Box>
@@ -76,13 +117,13 @@ export default function Signup() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
-                  name="firstName"
+                  name="fname"
                   required
                   fullWidth
                   id="firstName"
                   label="First Name"
                   autoFocus
-                  value={formData.firstName}
+                  value={formData.fname}
                   onChange={handleChange}
                 />
               </Grid>
@@ -92,9 +133,9 @@ export default function Signup() {
                   fullWidth
                   id="lastName"
                   label="Last Name"
-                  name="lastName"
+                  name="lname"
                   autoComplete="family-name"
-                  value={formData.lastName}
+                  value={formData.lname}
                   onChange={handleChange}
                 />
               </Grid>
@@ -124,19 +165,37 @@ export default function Signup() {
                 />
               </Grid>
               <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="phone"
+                  label="Phone Number"
+                  type="tel"
+                  id="phone"
+                  autoComplete="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
                 <FormControlLabel
                   control={
                     <Checkbox
-                      name="termsAccepted"
-                      checked={formData.termsAccepted}
+                      name="terms"
+                      checked={formData.terms}
                       onChange={handleChange}
                       sx={{ color: 'rgba(0, 0, 0, 0.5)' }}
                     />
                   }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                  label="I have agreed to the terms and conditions."
                 />
               </Grid>
             </Grid>
+            {isError && (
+              <Typography color="error" sx={{ mt: 2 }}>
+                {errorMessage}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
